@@ -13,4 +13,4 @@ echo "[*] 가상환경 활성화 후 python 경로: $(which python)"
 echo "[*] 가상환경 활성화 후 manage.py 존재 여부:"
 
 cd /home/ubuntu/amadeus-flight-booking-django
-python amadeus_demo_api/manage.py runserver 0.0.0.0:8000
+python amadeus_demo_api/manage.py runserver 0.0.0.0:8001
