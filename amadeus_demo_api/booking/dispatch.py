@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .views import FlightSearchView, FlightPriceView, FlightCreateOrderView, FlightOrderRetrieveView, FlightOrderCancelView,FlightCreateOrderByIndexView
-
+from django.test.client import RequestFactory
 class AmadeusIntentDispatcherView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -26,16 +26,44 @@ class AmadeusIntentDispatcherView(APIView):
         # 성공 케이스: intent 타입에 따라 분기 처리
         if intent_type == "search":
             return FlightSearchView().post(request)
-        elif intent_type == "price":
-            return FlightPriceView().post(request)
-
+        # elif intent_type == "price":
+        #     return FlightPriceView().post(request)
         elif intent_type == "booking":
             number = ai_response.get("number")
             if number:
                 request.data["number"] = number
                 return FlightCreateOrderByIndexView().post(request)
-            else:
-                return FlightCreateOrderView().post(request)
+
+            flight_offers = ai_response.get("flightOffers")
+            if flight_offers:
+                # Step 1: 가격 확인 요청
+                factory = RequestFactory()
+                pricing_request = factory.post(
+                    "/api/booking/price/",
+                    data={"flightOffers": flight_offers},
+                    content_type="application/json"
+                )
+                pricing_request.user = request.user
+                pricing_request._force_auth_user = request.user
+
+                pricing_response = FlightPriceView().post(pricing_request)
+                if pricing_response.status_code != 200:
+                    return pricing_response
+
+                priced_offers = pricing_response.data["data"]["flightOffers"]
+
+                # Step 2: 예약 요청
+                booking_request = factory.post(
+                    "/api/booking/create/",
+                    data={"flightOffers": priced_offers},
+                    content_type="application/json"
+                )
+                booking_request.user = request.user
+                booking_request._force_auth_user = request.user
+
+                return FlightCreateOrderView().post(booking_request)
+
+            return Response({"error": "number 또는 flightOffers 정보가 필요합니다."}, status=400)
 
         elif intent_type == "retrieve":
             flight_order_id = ai_response.get("flight_order_id")
