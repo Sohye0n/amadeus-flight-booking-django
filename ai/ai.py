@@ -61,9 +61,10 @@ def extract_search(state: State):
         Return in json form.
         ex: {"originLocationCode": "SYD", "destinationLocationCode": "BKK", "departureDate": "2023-05-02", "adults": 3}
 
-        IMPORTANT: if you can not resolve value from the conversation history, then set 'false' value.
-        ex: {"originLocationCode": "SYD", "destinationLocationCode": "BKK", "departureDate": "false", "adults": 3}
-
+        IMPORTANT: 
+        1. If you can not resolve value from the conversation history, then set 'false' value.
+        2. If you want to set 0 in "adults" value, instead set "false".
+        ex: {"originLocationCode": "SYD", "destinationLocationCode": "BKK", "departureDate": "false", "adults": "false"}
         Below are the chat_history:
 
     '''
@@ -165,7 +166,13 @@ class LLM:
             ret |= {'originLocationCode': response['originLocationCode'] if response['originLocationCode'] != 'false' else False}
             ret |= {'destinationLocationCode': response['destinationLocationCode'] if response['destinationLocationCode'] != 'false' else False}
             ret |= {'departureDate': response['departureDate'] if response['departureDate'] != 'false' else False}
-            ret |= {'adults': response['adults'] if response['adults'] != 'false' else False}
+            if isinstance(response['adults'], int):
+                if response['adults'] == 0:
+                    ret |= {'adults': False}
+                else:
+                    ret |= {'adults': response['adults']}
+            else:
+                ret |= {'adults': False}
             return ret
         elif response['type'] == 'booking with number':
             ret = {'type': 'booking with number', 'success': response['success']}
