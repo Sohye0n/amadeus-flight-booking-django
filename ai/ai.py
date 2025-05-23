@@ -156,10 +156,6 @@ class LLM:
     @classmethod
     def invoke(cls, chat_history):
         response = app.invoke({'chat_history': chat_history})
-
-        ## TODO
-        # 문자열 "false"를 False로 바꾸기.
-        # 각 type에 맞게 다 리턴하기
         if response['type'] == 'search':
             ret = {'type': 'search', 'success': response['success']}
             ret |= {'originLocationCode': response['originLocationCode'] if response['originLocationCode'] != 'false' else False}
