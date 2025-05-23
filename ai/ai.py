@@ -84,7 +84,9 @@ def extract_booking_with_number(state: State):
         Return in json form.
         ex: {"number": 3}
 
-        IMPORTANT: if you can not resolve value from the conversation history, then set 'false' value.
+        IMPORTANT: 
+        1. If you can not resolve value from the conversation history, then set 'false' value.
+        2. Do not set 0 value. instead set 'false'. 
         ex: {"number": "false"}
 
         Below are the chat_history:
@@ -107,7 +109,9 @@ def extract_cancel(state: State):
         Return in json form.
         ex: {"number": 3}
 
-        IMPORTANT: if you can not resolve value from the conversation history, then set 'false' value.
+        IMPORTANT: 
+        1. If you can not resolve value from the conversation history, then set 'false' value.
+        2. Do not set 0 value. instead set 'false'. 
         ex: {"number": "false"}
 
         Below are the chat_history:
