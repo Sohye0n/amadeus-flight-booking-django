@@ -96,7 +96,7 @@ def extract_booking_with_number(state: State):
     success = 'false' in dic.values()
     return {type: state['type'], 'success': not success} | dic
 
-def extract_for_cancel(state: State):
+def extract_cancel(state: State):
     prompt = '''
         You are tasked with analyzing user questions in a chatbot-based airline booking system.
         Your job is to extract the value from the conversation history.
@@ -119,7 +119,7 @@ def extract_for_cancel(state: State):
     success = 'false' in dic.values()
     return {type: state['type'], 'success': not success} | dic
 
-def extract_for_list(state: State):
+def extract_list(state: State):
     return {type: state['type'], 'success': True}
 
 def determine_extract_type(state: State):
@@ -130,8 +130,8 @@ graph = StateGraph(State)
 graph.add_node("classify_type", classify_type)
 graph.add_node("extract_search", extract_search)
 graph.add_node("extract_booking_with_number", extract_booking_with_number)
-graph.add_node("extract_for_cancel", extract_for_cancel)
-graph.add_node("extract_for_list", extract_for_list)
+graph.add_node("extract_cancel", extract_cancel)
+graph.add_node("extract_list", extract_list)
 
 graph.add_edge(START, "classify_type")
 graph.add_conditional_edges(
@@ -140,14 +140,14 @@ graph.add_conditional_edges(
     {
         "search": "extract_search",
         "booking with number": "extract_booking_with_number",
-        "cancel": "extract_for_cancel",
-        "list": "extract_for_list"
+        "cancel": "extract_cancel",
+        "list": "extract_list"
     }
 )
 graph.add_edge("extract_search", END)
 graph.add_edge("extract_booking_with_number", END)
-graph.add_edge("extract_for_cancel", END)
-graph.add_edge("extract_for_list", END)
+graph.add_edge("extract_cancel", END)
+graph.add_edge("extract_list", END)
 
 app = graph.compile()
 
