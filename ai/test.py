@@ -4,8 +4,8 @@ from ai import LLM as LLMv2
 
 data = {}
 
-# for type in ['search', 'booking_with_number', 'cancel', 'list']:
-for type in ['booking_with_number']:
+# for type in ['search', 'booking_with_number', 'cancel', 'list', 'mix_type']:
+for type in ['mix_type']:
     with open(type + '.json', 'r', encoding='utf-8') as file:
         data = json.load(file)['data']
 
@@ -16,7 +16,8 @@ for type in ['booking_with_number']:
         answer = i['answer']
 
 
-        responsev1 = LLMv1.invoke(chat_history)
+        # responsev1 = LLMv1.invoke(chat_history)
+        responsev1 = "test"
         responsev2 = LLMv2.invoke(chat_history)
 
         print(f'{idx+1}:')
