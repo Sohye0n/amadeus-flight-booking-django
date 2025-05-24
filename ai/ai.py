@@ -61,9 +61,10 @@ def extract_search(state: State):
         Return in json form.
         ex: {"originLocationCode": "SYD", "destinationLocationCode": "BKK", "departureDate": "2023-05-02", "adults": 3}
 
-        IMPORTANT: if you can not resolve value from the conversation history, then set 'false' value.
-        ex: {"originLocationCode": "SYD", "destinationLocationCode": "BKK", "departureDate": "false", "adults": 3}
-
+        IMPORTANT: 
+        1. If you can not resolve value from the conversation history, then set 'false' value.
+        2. If you want to set 0 in "adults" value, instead set "false".
+        ex: {"originLocationCode": "SYD", "destinationLocationCode": "BKK", "departureDate": "false", "adults": "false"}
         Below are the chat_history:
 
     '''
@@ -84,7 +85,9 @@ def extract_booking_with_number(state: State):
         Return in json form.
         ex: {"number": 3}
 
-        IMPORTANT: if you can not resolve value from the conversation history, then set 'false' value.
+        IMPORTANT: 
+        1. If you can not resolve value from the conversation history, then set 'false' value.
+        2. Do not set 0 value. instead set 'false'. 
         ex: {"number": "false"}
 
         Below are the chat_history:
@@ -107,7 +110,9 @@ def extract_cancel(state: State):
         Return in json form.
         ex: {"number": 3}
 
-        IMPORTANT: if you can not resolve value from the conversation history, then set 'false' value.
+        IMPORTANT: 
+        1. If you can not resolve value from the conversation history, then set 'false' value.
+        2. Do not set 0 value. instead set 'false'. 
         ex: {"number": "false"}
 
         Below are the chat_history:
@@ -156,24 +161,38 @@ class LLM:
     @classmethod
     def invoke(cls, chat_history):
         response = app.invoke({'chat_history': chat_history})
-
-        ## TODO
-        # 문자열 "false"를 False로 바꾸기.
-        # 각 type에 맞게 다 리턴하기
         if response['type'] == 'search':
             ret = {'type': 'search', 'success': response['success']}
             ret |= {'originLocationCode': response['originLocationCode'] if response['originLocationCode'] != 'false' else False}
             ret |= {'destinationLocationCode': response['destinationLocationCode'] if response['destinationLocationCode'] != 'false' else False}
             ret |= {'departureDate': response['departureDate'] if response['departureDate'] != 'false' else False}
-            ret |= {'adults': response['adults'] if response['adults'] != 'false' else False}
+            if isinstance(response['adults'], int):
+                if response['adults'] == 0:
+                    ret |= {'adults': False}
+                else:
+                    ret |= {'adults': response['adults']}
+            else:
+                ret |= {'adults': False}
             return ret
         elif response['type'] == 'booking with number':
             ret = {'type': 'booking with number', 'success': response['success']}
-            ret |= {'number': response['number'] if response['number'] != 'false' else False}
+            if isinstance(response['number'], int):
+                if response['number'] == 0:
+                    ret |= {'number': False}
+                else:
+                    ret |= {'number': response['number']}
+            else:
+                ret |= {'number': False}
             return ret
         elif response['type'] == 'cancel':
             ret = {'type': 'cancel', 'success': response['success']}
-            ret |= {'number': response['number'] if response['number'] != 'false' else False}
+            if isinstance(response['number'], int):
+                if response['number'] == 0:
+                    ret |= {'number': False}
+                else:
+                    ret |= {'number': response['number']}
+            else:
+                ret |= {'number': False}
             return ret
         elif response['type'] == 'list':
             return {'type': 'list', 'success': response['success']}
