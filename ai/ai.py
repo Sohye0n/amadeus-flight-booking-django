@@ -38,6 +38,12 @@ def classify_type(state: State):
         "cancel": Flight Cancellation Questions
         "list": Flight Reservation List Questions
         
+        IMPORTANT:
+        The conversation history may include various types of scenarios.
+        For example, a user might search for a flight and then ask for a reservation list, or cancel a booking and then proceed to search for flights.
+        In such cases, you must identify and return the type of the last user question in the conversation history.
+        Always return only the type of the most recent question, and no other information.
+
         Return only type name ex: search, booking with number, cancel, list
 
         Below are the chat_history:
@@ -66,6 +72,10 @@ def extract_search(state: State):
         2. If you want to set 0 in "adults" value, instead set "false".
         ex: {"originLocationCode": "SYD", "destinationLocationCode": "BKK", "departureDate": "false", "adults": "false"}
         Below are the chat_history:
+        3. The values you are tasked with extracting may appear multiple times in the conversation history.
+           In such cases, you should determine which value to extract based on the context of the conversation.
+           Generally, the most recent value from the conversation is used, unless the context suggests otherwise.
+           Always use your judgment based on the conversation history to select the appropriate value to return.
 
     '''
     prompt = append_chat_history(prompt, state['chat_history'])
@@ -89,6 +99,10 @@ def extract_booking_with_number(state: State):
         1. If you can not resolve value from the conversation history, then set 'false' value.
         2. Do not set 0 value. instead set 'false'. 
         ex: {"number": "false"}
+        3. The values you are tasked with extracting may appear multiple times in the conversation history.
+           In such cases, you should determine which value to extract based on the context of the conversation.
+           Generally, the most recent value from the conversation is used, unless the context suggests otherwise.
+           Always use your judgment based on the conversation history to select the appropriate value to return.
 
         Below are the chat_history:
 
@@ -114,6 +128,10 @@ def extract_cancel(state: State):
         1. If you can not resolve value from the conversation history, then set 'false' value.
         2. Do not set 0 value. instead set 'false'. 
         ex: {"number": "false"}
+        3. The values you are tasked with extracting may appear multiple times in the conversation history.
+           In such cases, you should determine which value to extract based on the context of the conversation.
+           Generally, the most recent value from the conversation is used, unless the context suggests otherwise.
+           Always use your judgment based on the conversation history to select the appropriate value to return.
 
         Below are the chat_history:
 
@@ -169,6 +187,7 @@ class LLM:
             if isinstance(response['adults'], int):
                 if response['adults'] == 0:
                     ret |= {'adults': False}
+                    ret['success'] = False
                 else:
                     ret |= {'adults': response['adults']}
             else:
@@ -179,6 +198,7 @@ class LLM:
             if isinstance(response['number'], int):
                 if response['number'] == 0:
                     ret |= {'number': False}
+                    ret['success'] = False
                 else:
                     ret |= {'number': response['number']}
             else:
@@ -189,6 +209,7 @@ class LLM:
             if isinstance(response['number'], int):
                 if response['number'] == 0:
                     ret |= {'number': False}
+                    ret['success'] = False
                 else:
                     ret |= {'number': response['number']}
             else:
