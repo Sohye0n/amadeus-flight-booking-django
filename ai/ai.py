@@ -176,11 +176,23 @@ class LLM:
             return ret
         elif response['type'] == 'booking with number':
             ret = {'type': 'booking with number', 'success': response['success']}
-            ret |= {'number': response['number'] if response['number'] != 'false' else False}
+            if isinstance(response['number'], int):
+                if response['number'] == 0:
+                    ret |= {'number': False}
+                else:
+                    ret |= {'number': response['number']}
+            else:
+                ret |= {'number': False}
             return ret
         elif response['type'] == 'cancel':
             ret = {'type': 'cancel', 'success': response['success']}
-            ret |= {'number': response['number'] if response['number'] != 'false' else False}
+            if isinstance(response['number'], int):
+                if response['number'] == 0:
+                    ret |= {'number': False}
+                else:
+                    ret |= {'number': response['number']}
+            else:
+                ret |= {'number': False}
             return ret
         elif response['type'] == 'list':
             return {'type': 'list', 'success': response['success']}
