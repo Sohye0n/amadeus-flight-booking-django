@@ -10,6 +10,8 @@ from rest_framework.permissions import IsAuthenticated
 import requests
 from .amadeus import AMADEUS_API_BASE_URL
 import urllib.parse
+from urllib.parse import unquote
+
 
 class FlightSearchView(APIView):
     permission_classes = [IsAuthenticated]
@@ -271,6 +273,7 @@ class FlightOrderRetrieveView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, flight_order_id):
+        flight_order_id = unquote(flight_order_id)
         url = f"{AMADEUS_API_BASE_URL}/v1/booking/flight-orders/{flight_order_id}"
 
         response = requests.get(url, headers=AmadeusService.get_headers())
