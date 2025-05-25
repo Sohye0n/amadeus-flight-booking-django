@@ -262,7 +262,9 @@ class FlightCreateOrderByIndexView(APIView):
             return Response({"error": f"{number}번 항공편을 찾을 수 없습니다."}, status=404)
 
         # 기존 예약 로직 재활용
-        return FlightCreateOrderView.create_with_offer(request, flight_offer)
+        request.data["flightOffers"] = [flight_offer]
+        return FlightCreateOrderView().post(request)
+        #return FlightCreateOrderView.create_with_offer(request, flight_offer)
 
 
 class FlightOrderRetrieveView(APIView):
