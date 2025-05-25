@@ -3,12 +3,13 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .views import FlightSearchView, FlightPriceView, FlightCreateOrderView, FlightOrderRetrieveView, FlightOrderCancelView,FlightCreateOrderByIndexView
 from django.test.client import RequestFactory
+from .models import FlightOrder
 class AmadeusIntentDispatcherView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         ai_response = request.data  # 이미 AI 서버 응답이라고 가정
-        print("AI 서버 응답 debug:", ai_response)
+        #print("AI 서버 응답 debug:", ai_response)
         print("dispatcher user:", request.user)
         print("dispatcher auth:", getattr(request, "auth", None))
         intent_type = ai_response.get("type")
@@ -29,7 +30,7 @@ class AmadeusIntentDispatcherView(APIView):
             return FlightSearchView().post(request)
         # elif intent_type == "price":
         #     return FlightPriceView().post(request)
-        elif intent_type == "booking":
+        elif intent_type == "booking with number":
             number = ai_response.get("number")
             if number:
                 request.data["number"] = number
@@ -66,10 +67,31 @@ class AmadeusIntentDispatcherView(APIView):
 
             return Response({"error": "number 또는 flightOffers 정보가 필요합니다."}, status=400)
 
-        elif intent_type == "retrieve":
+        elif intent_type == "list":
             flight_order_id = ai_response.get("flight_order_id")
+            if not flight_order_id:
+                number = int(ai_response.get("number", 1))
+                orders = FlightOrder.objects.filter(user=request.user).order_by("-created_at")
+                if not orders.exists():
+                    return Response({"error": "예약 내역이 없습니다."}, status=404)
+                try:
+                    selected_order = orders[number - 1]
+                except IndexError:
+                    return Response({"error": f"{number}번째 예약을 찾을 수 없습니다."}, status=404)
+                flight_order_id = selected_order.flight_order_id
+
             return FlightOrderRetrieveView().get(request, flight_order_id=flight_order_id)
 
+
         elif intent_type == "cancel":
-            flight_order_id = ai_response.get("flight_order_id")
+            number = int(ai_response.get("number", 1))
+            orders = FlightOrder.objects.filter(user=request.user, status="CONFIRMED").order_by("-created_at")
+            if not orders.exists():
+                return Response({"error": "취소할 수 있는 예약이 없습니다."}, status=404)
+            try:
+                selected_order = orders[number - 1]
+            except IndexError:
+                return Response({"error": f"{number}번째 예약을 찾을 수 없습니다."}, status=404)
+
+            flight_order_id = selected_order.flight_order_id
             return FlightOrderCancelView().post(request, flight_order_id=flight_order_id)

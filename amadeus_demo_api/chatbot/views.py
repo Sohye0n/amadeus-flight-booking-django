@@ -53,6 +53,7 @@ class AskChatbotView(APIView):
                 timeout=5
             )
             ai_data = ai_response.json()
+            print("AI 서버 응답:", ai_data)
         except Exception as e:
             return Response({"error": "AI 서버 연결 실패", "detail": str(e)}, status=500)
 
