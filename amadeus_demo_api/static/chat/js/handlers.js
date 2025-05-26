@@ -30,7 +30,7 @@ function handleSearch(data) {
             출발 시간은 ${formatDateTime(departure_time)}, 도착 시간은 ${formatDateTime(arrival_time)}로
             총 ${durationHours}시간 ${durationMinutes}분이 소요됩니다.\n가격은 ${price}입니다. 경유 ${number_of_stops}회.`);
     })
-    return matchingAnwers
+    return matchingAnwers.join("--------------");
 }
 
 // "search" 타입 질문에 대한 답변 가공
@@ -162,8 +162,7 @@ function handleFlightOrder(data) {
     flightInfo(flightOffer).forEach(Element => matchingAnwers.push(Element));
     const travelers = data.data.travelers;
     travelorInfo(travelers).forEach(Element => matchingAnwers.push(Element));
-  
-    return matchingAnwers;
+    return matchingAnwers.join("--------------");
 }
 
 function handleList(data) {
@@ -174,6 +173,6 @@ return answer;
 
 function defaultHandler(data) {
 // 기본 처리
-console.log("Default handler:", answer);
-return answer;
+    console.log("Default handler:", data);
+    return data.message;
 }
