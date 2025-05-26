@@ -35,7 +35,10 @@ class FlightSearchView(APIView):
 
         if search_response.status_code != 200:
             AmadeusService.reset_token()
-            return Response({"error": "Flight search failed."}, status=search_response.status_code)
+            return Response({
+                "type": "search",
+                "status": "failed",
+                "error": "Flight search response code is not 200,failed."}, status=search_response.status_code)
 
         search_result = search_response.json()
 
@@ -73,6 +76,9 @@ class FlightSearchView(APIView):
                 }
             }
             summery_payload = {
+                    "type": "search",
+                    "status": "success",
+                    "message": "Flight search successful.",
                     "search_id": search_record.id,
                     "flightOffers": [
                         {
@@ -90,7 +96,10 @@ class FlightSearchView(APIView):
             }
 
         except KeyError:
-            return Response({"error": "Search result missing flightOffers."}, status=400)
+            return Response({
+                "type": "search",
+                "status": "failed",
+                "message": "ERROR: Search result missing flightOffers."}, status=400)
 
         #return Response(pricing_payload, status=200)
         return Response(summery_payload, status=200)
@@ -111,7 +120,10 @@ class FlightPriceView(APIView):
             return Response(response.json(), status=200)
         else:
             AmadeusService.reset_token()
-            return Response({"error": "Flight pricing failed."}, status=response.status_code)
+            return Response({
+                "type": "booking with number",
+                "status": "failed",
+                "message": "ERROR: Flight pricing check failed."}, status=response.status_code)
 
 
 
@@ -123,19 +135,28 @@ class FlightCreateOrderView(APIView):
 
         flight_offers = request.data.get("flightOffers")
         if not flight_offers:
-            return Response({"error": "No flightOffers provided."}, status=400)
+            return Response({
+                "type": "booking with number",
+                "status": "failed",
+                "message": "ERROR: No flightOffers provided."}, status=400)
 
         # Step 1: PassportInfo 가져오기
         passports = PassportInfo.objects.filter(user=request.user)
         if not passports.exists():
-            return Response({"error": "No passport information found."}, status=400)
+            return Response({
+                "type": "booking with number",
+                "status": "failed",
+                "message": "ERROR: No passport information found."}, status=400)
 
         # Step 2: travelerPricings에서 필요한 travelerId 목록 추출
         traveler_pricings = flight_offers[0].get("travelerPricings", [])
         traveler_ids = [tp["travelerId"] for tp in traveler_pricings]
 
         if len(traveler_ids) > passports.count():
-            return Response({"error": "Not enough passport information for travelers."}, status=400)
+            return Response({
+                "type": "booking with number",
+                "status": "failed",
+                "message": "ERROR: Not enough passport information for travelers."}, status=400)
 
         # Step 3: travelerId 기준으로 travelers 매칭해서 생성
         travelers = []
@@ -222,11 +243,17 @@ class FlightCreateOrderView(APIView):
             try:
                 error_detail = response.json()
             except Exception:
-                error_detail = {"error": "No detail available", "status_code": response.status_code}
+                error_detail = {
+                    "type": "booking with number",
+                    "status": "failed",
+                    "message": "ERROR: No detail available", 
+                    "status_code": response.status_code}
             
             AmadeusService.reset_token()
             return Response({
-                "error": "Flight booking failed.",
+                "type": "booking with number",
+                "status": "failed",
+                "message": "ERROR: Flight booking failed.",
                 "detail": error_detail,    #에러 상세 반환
                 "payload": payload         # payload도 같이 반환
             }, status=response.status_code)
@@ -250,7 +277,10 @@ class FlightCreateOrderByIndexView(APIView):
         number = request.data.get("number")  # 챗봇이 보내는 항공편 선택 번호
 
         if not number:
-            return Response({"error": "number 필드가 필요합니다."}, status=400)
+            return Response({
+                "type": "booking with number",
+                "status": "failed",
+                "message": "ERROR: number 필드가 필요합니다."}, status=400)
 
         try:
             # 최신 검색 기준으로 최대 5개 중 선택
@@ -261,7 +291,10 @@ class FlightCreateOrderByIndexView(APIView):
             selected_offer = offers[int(number) - 1]
             flight_offer = selected_offer.offer_json
         except (IndexError, ValueError):
-            return Response({"error": f"{number}번 항공편을 찾을 수 없습니다."}, status=404)
+            return Response({
+                "type": "booking with number",
+                "status": "failed",
+                "message": f"ERROR: {number}번 항공편을 찾을 수 없습니다."}, status=404)
 
         # 기존 예약 로직 재활용
         request.data["flightOffers"] = [flight_offer]
@@ -281,13 +314,17 @@ class FlightOrderRetrieveView(APIView):
 
         if response.status_code != 200:
             AmadeusService.reset_token()
-            return Response({"error": "Flight order retrieval failed."}, status=response.status_code)
+            return Response({
+                "type": "list",
+                "status": "failed",
+                "message": "ERROR: Flight order list is not 200, failed."}, status=response.status_code)
 
         # Step 1: errors 필드 체크
         if "errors" in response_data:
             return Response({
+                "type": "list",
                 "status": "failed",
-                "errors": response_data["errors"]
+                "message": response_data["errors"]
             }, status=400)
 
         # Step 2: warnings 필드 체크
@@ -307,6 +344,8 @@ class FlightOrderRetrieveView(APIView):
             )
         # Step 3: 정상 데이터 반환 + warning 추가
         return Response({
+            "type": "list",
+
             "status": "success",
             "warnings": warning_messages,
             "orderData": response_data.get("data", {})
@@ -333,7 +372,13 @@ class FlightOrderCancelView(APIView):
                 cancel_request_payload={"method": "DELETE", "url": url},
                 cancel_response_payload={"status_code": 204, "message": "Cancelled"}
             )
-            return Response({"message": "Flight order cancelled successfully."}, status=204)
+            return Response({
+                "type": "cancel",
+                "status": "success",
+                "message": "Flight order cancelled successfully."}, status=204)
         else:
             AmadeusService.reset_token()
-            return Response({"error": "Flight order cancellation failed."}, status=response.status_code)
+            return Response({
+                "type": "cancel",
+                "status": "failed",
+                "message": "ERROR: Flight order cancellation failed."}, status=response.status_code)

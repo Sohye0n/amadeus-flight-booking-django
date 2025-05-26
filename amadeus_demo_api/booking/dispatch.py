@@ -20,7 +20,8 @@ class AmadeusIntentDispatcherView(APIView):
             missing_fields = [k for k, v in ai_response.items() if v is False and k not in ['type', 'success']]
             message = "\n".join([f"{field} 값이 필요합니다." for field in missing_fields])
             return Response({
-                "success": False,
+                "type": intent_type,
+                "status": "failed",
                 "missing_fields": missing_fields,
                 "message": message
             }, status=200)
@@ -65,7 +66,10 @@ class AmadeusIntentDispatcherView(APIView):
 
                 return FlightCreateOrderView().post(booking_request)
 
-            return Response({"error": "number 또는 flightOffers 정보가 필요합니다."}, status=400)
+            return Response({
+                "type": intent_type,
+                "status": "failed",
+                "message": "ERROR: number 또는 flightOffers 정보가 필요합니다."}, status=400)
 
         elif intent_type == "list":
             flight_order_id = ai_response.get("flight_order_id")
@@ -73,11 +77,17 @@ class AmadeusIntentDispatcherView(APIView):
                 number = int(ai_response.get("number", 1))
                 orders = FlightOrder.objects.filter(user=request.user).order_by("-created_at")
                 if not orders.exists():
-                    return Response({"error": "예약 내역이 없습니다."}, status=404)
+                    return Response({
+                        "type": intent_type,
+                        "status": "failed",
+                        "message": "ERROR: 예약 내역이 없습니다."}, status=404)
                 try:
                     selected_order = orders[number - 1]
                 except IndexError:
-                    return Response({"error": f"{number}번째 예약을 찾을 수 없습니다."}, status=404)
+                    return Response({
+                        "type": intent_type,
+                        "status": "failed",
+                        "message": f"ERROR: {number}번째 예약을 찾을 수 없습니다."}, status=404)
                 flight_order_id = selected_order.flight_order_id
                 print("id: ", flight_order_id)
             return FlightOrderRetrieveView().get(request, flight_order_id=flight_order_id)
@@ -87,12 +97,18 @@ class AmadeusIntentDispatcherView(APIView):
             number = int(ai_response.get("number", 1))#일단 1로 설정하자자
             orders = FlightOrder.objects.filter(user=request.user, status="CONFIRMED").order_by("-created_at")
             if not orders.exists():
-                return Response({"error": "취소할 수 있는 예약이 없습니다."}, status=404)
+                return Response({
+                    "type": intent_type,
+                    "status": "failed",
+                    "message": "ERROR: 취소할 수 있는 예약이 없습니다."}, status=404)
             try:
                 selected_order = orders[0]
                 #selected_order = orders[number - 1]
             except IndexError:
-                return Response({"error": f"{number}번째 예약을 찾을 수 없습니다."}, status=404)
+                return Response({
+                    "type": intent_type,
+                    "status": "failed",
+                    "message": f"ERROR: {number}번째 예약을 찾을 수 없습니다."}, status=404)
 
             flight_order_id = selected_order.flight_order_id
             return FlightOrderCancelView().post(request, flight_order_id=flight_order_id)
