@@ -773,7 +773,10 @@
 	<script src="{% static '/chat/js/chat5.js' %}"
 		type="text/javascript"></script>
 	<script src="{% static '/chat/js/chat6.js' %}"
-		type="text/javascript"></script><!-- Set Examples Link Text on Input  -->
+		type="text/javascript"></script>
+	<script src="{% static '/chat/js/handler.js' %}"
+		type="text/javascript"></script>
+	<!-- Set Examples Link Text on Input  -->
 	<script>
 		// Add event listener to all elements with class ".gpt_home-content_table-content.is-link"
 		// gpt_home-content_table-content is- << 로 검색하면 됨.
@@ -915,14 +918,6 @@
 
 		// fetch previous chatting session & name
 		if (window.location.pathname.startsWith("/chat")) {
-			// fetch("/api/chat/sessions")
-			// 	.then(res => res.json())
-			// 	.then(data => {
-			// 		renderPreviousChatSessions(data.sessions);
-			// 	})
-			// 	.catch(err => {
-			// 		console.error("채팅 세션 목록 불러오기 실패:", err);
-			// 	});
 			console.log("init")
 
 			const sessions = [
@@ -959,12 +954,27 @@
 		}
 
 		async function sendMessage(inputValue){
+			// response 타입에 따라 다른 형식의 렌더링 필요
 			try {
 				const response = await apiClient.post('chat/ask/', {
 				"question": inputValue
 				});
-				const matchingAnswer = response.data.message;
-				return matchingAnswer
+				const questionType = response.data.type;
+
+				const handlers = {
+					search: handleSearch,
+					'flight-order': handleFlightOrder,
+					list: handleList
+				};
+
+				if (questionType) {
+					const handler = handlers[questionType];
+					return handler(response.data);
+				} else {
+					console.log(`request failure`);
+					return defaultHandler(response.data);
+				}
+
 			} catch (error) {
 				console.error("Error:", error);
 			}

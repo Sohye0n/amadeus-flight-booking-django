@@ -950,7 +950,14 @@
         sessionId_wrapper.classList.add('session-id');
         sessionId_wrapper.innerText = sessionId;
         latest.appendChild(sessionId_wrapper);
+        
+        const chatContainer = document.querySelector(".gpt_content-answer");
+        const chatLines = chatContainer.querySelectorAll(".gpt_content-line");
 
+        chatLines.forEach(line => {
+            console.log(chatContainer)
+            chatContainer.removeChild(line);
+        });
 
 		form.addEventListener("submit", async event => {
 
@@ -962,7 +969,6 @@
 
 			// Get the query entered by the user in the form
 			const inputValue = document.querySelector(".gpt_input").value;
-            
 			let matchingAnswer;
 
 			// 백엔드에 메시지 전달
