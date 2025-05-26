@@ -311,7 +311,9 @@ class FlightOrderRetrieveView(APIView):
 
         response = requests.get(url, headers=AmadeusService.get_headers())
         response_data = response.json()
-
+        print("Received order ID:", flight_order_id)
+        print("Decoded order ID:", unquote(flight_order_id))
+        print("All stored IDs:", list(FlightOrder.objects.values_list("flight_order_id", flat=True)))
         if response.status_code != 200:
             AmadeusService.reset_token()
             return Response({
