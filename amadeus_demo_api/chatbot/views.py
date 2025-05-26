@@ -35,7 +35,9 @@ class AskChatbotView(APIView):
         print("Authorization header:", request.META.get('HTTP_AUTHORIZATION'))
         question = request.data.get('question')
         if not question:
-            return Response({"error": "질문이 필요합니다."}, status=400)
+            return Response({
+                "status": "failed",
+                "message": "질문이 필요합니다."}, status=400)
 
         user = request.user
         chat_records = ChatHistory.objects.filter(user=user).order_by('timestamp')
@@ -55,7 +57,10 @@ class AskChatbotView(APIView):
             ai_data = ai_response.json()
             print("AI 서버 응답:", ai_data)
         except Exception as e:
-            return Response({"error": "AI 서버 연결 실패", "detail": str(e)}, status=500)
+            return Response({
+                "status": "failed",
+                "message": "ERROR: AI 서버 연결 실패", 
+                "detail": str(e)}, status=500)
 
         # 질문 기록 먼저 저장
         ChatHistory.objects.create(user=user, question=question, answer=str(ai_data))
