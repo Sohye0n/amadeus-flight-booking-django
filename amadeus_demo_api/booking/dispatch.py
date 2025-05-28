@@ -17,7 +17,7 @@ class AmadeusIntentDispatcherView(APIView):
 
         if not success:
             # 누락된 필드 반환 (앞서 설명한 형식)
-            missing_fields = [k for k, v in ai_response.items() if v is False and k not in ['type', 'success']]
+            missing_fields = [k for k, v in ai_response.items() if v is False and k not in ['type', 'success','number']]
             message = "\n".join([f"{field} 값이 필요합니다." for field in missing_fields])
             return Response({
                 "type": intent_type,
@@ -80,14 +80,14 @@ class AmadeusIntentDispatcherView(APIView):
                     return Response({
                         "type": intent_type,
                         "status": "failed",
-                        "message": "ERROR: 예약 내역이 없습니다."}, status=404)
+                        "message": "ERROR: 예약 내역이 없습니다."}, status=400)
                 try:
                     selected_order = orders[number - 1]
                 except IndexError:
                     return Response({
                         "type": intent_type,
                         "status": "failed",
-                        "message": f"ERROR: {number}번째 예약을 찾을 수 없습니다."}, status=404)
+                        "message": f"ERROR: {number}번째 예약을 찾을 수 없습니다."}, status=400)
                 flight_order_id = selected_order.flight_order_id
                 print("id: ", flight_order_id)
             return FlightOrderRetrieveView().get(request, flight_order_id=flight_order_id)
@@ -100,7 +100,7 @@ class AmadeusIntentDispatcherView(APIView):
                 return Response({
                     "type": intent_type,
                     "status": "failed",
-                    "message": "ERROR: 취소할 수 있는 예약이 없습니다."}, status=404)
+                    "message": "ERROR: 취소할 수 있는 예약이 없습니다."}, status=400)
             try:
                 selected_order = orders[0]
                 #selected_order = orders[number - 1]
@@ -108,7 +108,7 @@ class AmadeusIntentDispatcherView(APIView):
                 return Response({
                     "type": intent_type,
                     "status": "failed",
-                    "message": f"ERROR: {number}번째 예약을 찾을 수 없습니다."}, status=404)
+                    "message": f"ERROR: {number}번째 예약을 찾을 수 없습니다."}, status=400)
 
             flight_order_id = selected_order.flight_order_id
             return FlightOrderCancelView().post(request, flight_order_id=flight_order_id)
