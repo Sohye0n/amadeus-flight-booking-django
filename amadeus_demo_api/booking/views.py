@@ -38,7 +38,7 @@ class FlightSearchView(APIView):
             return Response({
                 "type": "search",
                 "status": "failed",
-                "error": "Flight search response code is not 200,failed."}, status=search_response.status_code)
+                "message": "ERROR: Flight search response code is not 200,failed."}, status=search_response.status_code)
 
         search_result = search_response.json()
 
@@ -256,7 +256,7 @@ class FlightCreateOrderView(APIView):
                 "message": "ERROR: Flight booking failed.",
                 "detail": error_detail,    #에러 상세 반환
                 "payload": payload         # payload도 같이 반환
-            }, status=response.status_code)
+            }, status=401)
         
     @staticmethod
     def get_traveler_type(date_of_birth):
@@ -327,7 +327,7 @@ class FlightOrderRetrieveView(APIView):
                 "type": "list",
                 "status": "failed",
                 "message": response_data["errors"]
-            }, status=400)
+            }, status=401)
 
         # Step 2: warnings 필드 체크
         warning_messages = []
@@ -383,4 +383,4 @@ class FlightOrderCancelView(APIView):
             return Response({
                 "type": "cancel",
                 "status": "failed",
-                "message": "ERROR: Flight order cancellation failed."}, status=response.status_code)
+                "message": "ERROR: Flight order cancellation failed."}, status=401)
