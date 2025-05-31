@@ -13,8 +13,7 @@ function login() {
         },
         body: JSON.stringify({
             username: username,
-            password: password,
-            redirect: redirect
+            password: password
         })
     })
     .then(response => response.json())
@@ -25,9 +24,10 @@ function login() {
             if (data.refresh) {
                 localStorage.setItem('refreshToken', data.refresh);
             }
-            alert(data.redirect);
             console.log(data.redirect)
-        } else {
+            window.location.href=data.redirect
+        }
+        else {
             alert('로그인 실패');
         }
     })
