@@ -89,6 +89,13 @@ class LoginView(View):
         print("requested_url", requested_url)
         return render(request, 'users/login.html', {'current_path': requested_url})
     
+# 프론트엔드 (로그인 화면 렌더링)
+class MypageView(View):
+    def get(self, request):
+        requested_url = request.headers.get('X-Requested-URL')
+        print("requested_url", requested_url)
+        return render(request, 'users/mypage.html', {'current_path': requested_url})
+    
 
 class UserMeView(APIView):#유저 정보보
     permission_classes = [IsAuthenticated]

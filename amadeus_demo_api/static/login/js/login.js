@@ -4,7 +4,6 @@ const csrftoken = getCookie('csrftoken');
 function login() {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
-    const redirect = document.getElementById('redirect').value;
     
     fetch('/api/login/', {
         method: 'POST',
