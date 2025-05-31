@@ -58,6 +58,7 @@ class LoginAPI(APIView):
             username = data.get('username')
             password = data.get('password')
 
+
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
 
@@ -69,6 +70,7 @@ class LoginAPI(APIView):
             access_token = str(refresh.access_token)
 
             return JsonResponse({
+                
                 'access': access_token,
                 'redirect': '/chat'
             }, status=200)
