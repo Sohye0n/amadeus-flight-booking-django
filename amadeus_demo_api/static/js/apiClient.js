@@ -61,7 +61,7 @@ apiClient.interceptors.response.use(
             // 401 에러 처리 (예: 자동 로그아웃)
             console.warn('인증 실패: 다시 로그인하세요.');
             localStorage.removeItem('jwt_token');
-            window.location.href = '/login';  // 로그인 페이지로 리다이렉트
+            window.location.href = '/users/login';  // 로그인 페이지로 리다이렉트
         }
         return Promise.reject(error);
     }
