@@ -49,6 +49,6 @@ jobs:
           cd ./amadeus-flight-booking-django
           docker-compose down
           git pull
-          python manage.py makemigrations
-          python manage.py migrate
-          docker-compose up --build
+          python3 manage.py makemigrations
+          python3 manage.py migrate
+          docker-compose up --build &
