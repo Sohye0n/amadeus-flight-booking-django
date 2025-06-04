@@ -12,7 +12,7 @@ class ChatSession(models.Model):
 
 class ChatHistory(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    session_id = models.CharField(max_length=255)
+    session_id = models.CharField(max_length=255,default = "1")
     question = models.TextField()
     answer = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
