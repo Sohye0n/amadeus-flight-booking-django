@@ -7,12 +7,6 @@ services:
       context: .
       dockerfile: Dockerfile  # Django의 Dockerfile 경로
     container_name: django_server
-    command: >
-      sh -c "
-        cd amadeus_demo_api
-        python manage.py migrate &&
-        python manage.py runserver 0.0.0.0:8000
-      "
     ports:
       - "8081:8000"  # 호스트의 8081번 포트를 컨테이너의 8000번 포트에 연결
     volumes:
