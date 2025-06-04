@@ -4,10 +4,8 @@ ENV PYTHONUNBUFFERED=1
 
 COPY . .
 
-RUN pip install -r requirements.txt
+RUN chmod +x entrypoint.sh
 
-ENTRYPOINT ["python", "amadeus_demo_api/manage.py"]
-
-CMD ["runserver", "0.0.0.0:8000"]
+ENTRYPOINT ["./entrypoint.sh"]
 
 EXPOSE 8000
