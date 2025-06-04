@@ -2,6 +2,8 @@
 function handleSearch(data) {
 
     console.log("Search handler:", data);
+    console.log(data.status)
+    if(data.status==="failed") return(data.message);
     
     function formatDateTime(dateTimeString) {
         const date = new Date(dateTimeString);
@@ -155,6 +157,7 @@ function handleFlightOrder(data) {
     }
   
     console.log('Flight Order handler:', data);
+    if(data.status==="failed") console.log("data.message")
     let matchingAnwers = [];
   
     // 항공/예약자 관련 정보 나누어 처리

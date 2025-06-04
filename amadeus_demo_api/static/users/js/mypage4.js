@@ -141,9 +141,8 @@ if (editForm) {
           expiry_date: document.getElementById('expiry_date').value
         };
       
-        // 서버로 전송 (POST 예시)
         try {
-          const response = await apiClient.post('/api/passport/add', data);
+          const response = await apiClient.post('passport/add/', data);
           console.log('서버 응답:', response.data);
           alert('정보가 성공적으로 저장되었습니다.');
         } catch (err) {

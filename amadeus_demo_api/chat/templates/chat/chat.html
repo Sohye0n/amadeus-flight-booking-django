@@ -44,6 +44,7 @@
 
 	<!-- CDN Typed.js -->
 	<script defer src="{% static '/chat/js/chat1.js' %}"></script>
+	<script defer src="{% static '/js/getCookie.js' %}"></script>
 
 	<!-- Hide Typde.js Cursor -->
 	<style>
@@ -209,7 +210,7 @@
 											</path>
 										</svg></div>
 									<div class="text-block">Light mode</div>
-								</a><a href="https://www.digidop.fr/contact" target="_blank"
+								</a><a href="https://54.79.200.131/users/mypage" target="_blank"
 									class="gpt_nav_link no-border w-inline-block">
 									<div class="icon-1x1-semimedium w-embed"><svg xmlns="http://www.w3.org/2000/svg"
 											xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img"
@@ -239,8 +240,8 @@
 											</g>
 										</svg></div>
 									<div>Digidop Académie</div>
-								</a><a href="/chat/" target="_blank"
-									class="gpt_nav_link no-border w-inline-block">
+								</a><a href="#"
+									class="gpt_nav_link no-border w-inline-block" id="home-link">
 									<div class="icon-1x1-semimedium w-embed"><svg xmlns="http://www.w3.org/2000/svg"
 											xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img"
 											class="iconify iconify--ic" width="100%" height="100%"
@@ -899,6 +900,8 @@
 
 			// 세션 id 가져오기
 			let sessionId = event.currentTarget.querySelector(".session-id").innerText
+			localStorage.removeItem("sessionId");
+			localStorage.setItem("sessionId", sessionId);
 
 			// 리다이렉트
 			history.pushState(null, '', `/chat/${sessionId}`);
@@ -917,14 +920,17 @@
 		}
 
 		// fetch previous chatting session & name
-		if (window.location.pathname.startsWith("/chat")) {
+		window.addEventListener('DOMContentLoaded', async function () {
 			console.log("init")
+			let sessions=await apiClient.get('/chat/sessions');
+			sessions = sessions.data;
+			console.log(localStorage.getItem('accessToken'))
 
-			const sessions = [
-				{ sessionId: "abc123", title: "파리로 가는 비행편 알려줘" },
-				{ sessionId: "def456", title: "다음 주 뉴욕 호텔 예약" },
-				{ sessionId: "ghi789", title: "국내선 할인 항공권 있어?" }
-			];
+			// const sessions = [
+			// 	{ sessionId: "abc123", title: "파리로 가는 비행편 알려줘" },
+			// 	{ sessionId: "def456", title: "다음 주 뉴욕 호텔 예약" },
+			// 	{ sessionId: "ghi789", title: "국내선 할인 항공권 있어?" }
+			// ];
 
 			sessions.forEach(session => {
 				//텍스트
@@ -942,7 +948,7 @@
 				session_bar_new.style.display = "flex";
 				session_list.appendChild(session_bar_new);
 			});
-		}
+		});
 
 		function generateUUID() {
 			// RFC4122 버전 4 UUID 생성기
@@ -953,11 +959,12 @@
 			})
 		}
 
-		async function sendMessage(inputValue){
+		async function sendMessage(sessionId,inputValue){
 			// response 타입에 따라 다른 형식의 렌더링 필요
 			try {
 				const response = await apiClient.post('chat/ask/', {
-				"question": inputValue
+					"sessionId": sessionId,
+					"question": inputValue
 				});
 				const questionType = response.data.type;
 
@@ -997,6 +1004,8 @@
 
 				let sessionId = generateUUID();
 				console.log(sessionId)
+				localStorage.removeItem("sessionId");
+				localStorage.setItem("sessionId",sessionId);
 				history.pushState(null, '', `/chat/${sessionId}`);
 
 				document.querySelector(".gpt_content-top").style.display = "none";
@@ -1014,7 +1023,7 @@
 
 				const latest = document.querySelector(".gpt_nav_conversation")
 				const sessionId_wrapper=document.createElement('div');
-				sessionId_wrapper.classList.add('session-id');
+				sessionId_wrapper.classList.add('sessionId');
 				sessionId_wrapper.innerText = sessionId;
 				latest.classList.add('selected')
 				latest.appendChild(sessionId_wrapper)
@@ -1023,8 +1032,9 @@
 			let matchingAnswer;
 
 			// 백엔드에 메시지 전달
-			matchingAnswer = await sendMessage(inputValue);
+			matchingAnswer = await sendMessage(localStorage.getItem("sessionId"),inputValue);
 			console.log(matchingAnswer);
+			console.log(localStorage.getItem('accessToken'))
 			// Adds the user's request to the conversation
 			const lightMode1 = document.querySelector(".icon-1x1-semimedium.is-light-mode");
 			const classList = lightMode1.style.display === "none" ? "is-light" : "is-dark";
@@ -1118,6 +1128,81 @@
 
 		// Call switchModes function when the element with id "ld-mode" is clicked
 		document.querySelector("#ld-mode").addEventListener("click", switchModes);
+
+		document.getElementById('home-link').addEventListener('click', async (event)=> {
+			event.preventDefault(); // 기본 링크 동작 막기
+			console.log('Navigated to /chat/ with pushState');
+			console.log(localStorage.getItem('accessToken'))
+			history.pushState(null, '', '/chat/'); // URL 변경
+			document.querySelector(".gpt_content-top").style.display = "flex";
+			document.querySelector(".gpt_content-answer").style.display = "none";
+			document.querySelector(".gpt_nav_conversation").style.display = "none";
+			console.log(localStorage.getItem('accessToken'))
+			renderChatPage();
+
+			// 필요하면 console.log나 추가 동작 가능
+			console.log('Navigated to /chat/ with pushState');
+		});
+
+		async function renderChatPage() {
+			isFirstSubmit=true;
+			let aT = localStorage.getItem('accessToken');
+			console.log(localStorage.getItem('accessToken'))
+			const rT = localStorage.getItem('refreshToken');
+			function getCookie(name) {
+				let cookieValue = null;
+				if (document.cookie && document.cookie !== '') {
+					const cookies = document.cookie.split(';');
+					for (let i = 0; i < cookies.length; i++) {
+						const cookie = cookies[i].trim();
+						if (cookie.substring(0, name.length + 1) === (name + '=')) {
+							cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+							break;
+						}
+					}
+				}
+				return cookieValue;
+			}
+
+			const csrftoken = getCookie('csrftoken')
+			console.log(csrftoken);
+
+			let sessions;
+			fetch('/api/chat/sessions', {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${aT}`,
+					'X-CSRFToken': csrftoken,
+				},
+			})
+			.then(response => response.json())
+			.then(data => {
+				console.log('응답:', data);
+				sessions=resonse.data;
+			})
+			.catch(error => {
+				window.location.href="/users/login"
+			});
+
+			sessions.forEach(session => {
+				//텍스트
+				const session_bar_origin = document.querySelector(".gpt_nav_conversation")
+				const session_bar_new = session_bar_origin.cloneNode(true)
+				const session_list = session_bar_origin.parentElement;
+
+				const sessionId_wrapper=document.createElement('div');
+				sessionId_wrapper.classList.add('session-id');
+				sessionId_wrapper.innerText = session.sessionId;
+				session_bar_new.appendChild(sessionId_wrapper)
+
+				let innerText = session_bar_new.querySelector('.gpt_nav_conversation-content-text');
+				innerText.innerHTML=session.title;
+				session_bar_new.style.display = "flex";
+				session_list.appendChild(session_bar_new);
+			});
+			console.log('Render chat page');
+		}
 
 	</script>
 </body>

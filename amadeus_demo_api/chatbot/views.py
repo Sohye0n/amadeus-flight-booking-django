@@ -7,23 +7,45 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from .models import ChatHistory
+from .models import ChatHistory, ChatSession
 from .serializers import ChatHistorySerializer
 from .models import ChatbotFlightActionLog
 from booking.dispatch import *
 from django.test.client import RequestFactory
-class ChatHistoryView(APIView):
+
+class sessionListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        chat_records = ChatHistory.objects.filter(user=request.user).order_by('timestamp')
-        chat_history_list = []
+        user = request.user
+        sessions = ChatSession.objects.filter(user=user).order_by('-created_at')
+        
+        session_list = [
+            {
+                "sessionId": session.session_id,
+                "title": session.title
+            }
+            for session in sessions
+        ]
+        
+        return Response(data=session_list, status=200)
 
-        for record in chat_records:
-            chat_history_list.append(record.question)
-            chat_history_list.append(record.answer)
+class ChatHistoryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        session_id = request.data.get("sessionId")
+        chat_records = ChatHistory.objects.filter(
+            user=request.user,
+            session_id=session_id
+        ).order_by('timestamp')
+
+        chat_history_list = []
+        chat_history_list = [item for r in chat_records for item in (r.question, r.answer)]
+
         #serializer = ChatHistorySerializer(chat_records, many=True)
         return Response({"chat_history": chat_history_list}, status=status.HTTP_200_OK)
+    
 @method_decorator(csrf_exempt, name='dispatch')    
 class AskChatbotView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -34,13 +56,26 @@ class AskChatbotView(APIView):
         print("auth:", request.auth)
         print("Authorization header:", request.META.get('HTTP_AUTHORIZATION'))
         question = request.data.get('question')
-        if not question:
+        session_id = request.data.get('sessionId')
+
+        if not all([question, session_id]):
             return Response({
                 "status": "failed",
-                "message": "질문이 필요합니다."}, status=400)
+                "message": "question과 sessionId가 필요합니다."
+            }, status=400)
 
         user = request.user
+
+        # 최초의 채팅일 경우 db에 세션 아이디와 제목 저장
+        if not ChatSession.objects.filter(user=user, session_id=session_id).exists():
+            ChatSession.objects.create(
+                user=user,
+                session_id=session_id,
+                title=question[:30]
+            )
+        
         chat_records = ChatHistory.objects.filter(user=user).order_by('timestamp')
+        chat_records = ChatHistory.objects.filter(user=user, session_id=session_id).order_by('timestamp')
         chat_history_list = [q for record in chat_records for q in (record.question, record.answer)]
         chat_history_list.append(question)
 
