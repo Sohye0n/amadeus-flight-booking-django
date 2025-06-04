@@ -156,3 +156,5 @@ SIMPLE_JWT = {
     'ALGORITHM': 'HS256',
     'SIGNING_KEY': SECRET_KEY,
 }
+LOGIN_REDIRECT_URL = './users/login'
+
