@@ -1,0 +1,13 @@
+{
+    "data" : [
+        {
+            "chat_history" : [
+                "내 예약들 보여줘"
+            ],
+            "answer": {
+                "type": "list",
+                "success": true
+            }
+        }
+    ]
+}

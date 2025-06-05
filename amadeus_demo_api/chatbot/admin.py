@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import ChatHistory,ChatbotFlightActionLog
+
+admin.site.register(ChatHistory)
+admin.site.register(ChatbotFlightActionLog)

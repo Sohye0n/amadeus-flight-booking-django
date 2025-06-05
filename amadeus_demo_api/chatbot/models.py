@@ -1,18 +1,25 @@
 from django.db import models
 from users.models import User
 
+class ChatSession(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    session_id = models.CharField(max_length=255, unique=True)
+    title = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.title} ({self.session_id})"
+
 class ChatHistory(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    session_id = models.CharField(max_length=255,default = "1")
     question = models.TextField()
     answer = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.user.username} - {self.timestamp}"
-    
+        return f"{self.user.username} - {self.session_id} - {self.timestamp}"
 
-from django.db import models
-from users.models import User
 
 class ChatbotFlightActionLog(models.Model):
     ACTION_TYPES = [

@@ -1,0 +1,158 @@
+{
+    "data" : [
+        {
+            "chat_history" : [
+                "인천에서 출발하고 런던공항으로 가는 비행기를 찾아줘"
+            ],
+            "answer": {
+                "type" : "search",
+                "success" : false,
+                "originLocationCode" : "ICN",
+                "destinationLocationCode" : "LHR",
+                "departureDate" : false,
+                "adults" : false
+            }
+        },
+        {
+            "chat_history" : [
+                "인천에서 출발하고 런던공항으로 가는 비행기를 찾아줘",
+                "출발날짜는 언제인가요?",
+                "2025년 11월 2일이야"
+            ],
+            "answer": {
+                "type" : "search",
+                "success" : false,
+                "originLocationCode" : "ICN",
+                "destinationLocationCode" : "LHR",
+                "departureDate" : "2025-11-02",
+                "adults" : false
+            }
+        },
+        {
+            "chat_history" : [
+                "인천에서 출발하고 런던공항으로 가는 비행기를 찾아줘",
+                "출발날짜는 언제인가요?",
+                "2025년 11월 2일이야",
+                "인원수는 몇명인가요?",
+                "3명"
+            ],
+            "answer": {
+                "type" : "search",
+                "success" : true,
+                "originLocationCode" : "ICN",
+                "destinationLocationCode" : "LHR",
+                "departureDate" : "2025-11-02",
+                "adults" : 3
+            }
+        },
+        {
+            "chat_history" : [
+                "홍콩에서 출발하는 비행기를 찾아줘"
+            ],
+            "answer": {
+                "type" : "search",
+                "success" : false,
+                "originLocationCode" : "HKG",
+                "destinationLocationCode" : false,
+                "departureDate" : false,
+                "adults" : false
+            }
+        },
+        {
+            "chat_history" : [
+                "홍콩에서 출발하는 비행기를 찾아줘",
+                "도착지는 어디인`가요?",
+                "인천공항"
+            ],
+            "answer": {
+                "type" : "search",
+                "success" : false,
+                "originLocationCode" : "HKG",
+                "destinationLocationCode" : "ICN",
+                "departureDate" : false,
+                "adults" : false
+            }
+        },
+        {
+            "chat_history" : [
+                "홍콩에서 출발하는 비행기를 찾아줘",
+                "도착지는 어디인가요?",
+                "인천공항",
+                "출발날짜는 언제인가요?",
+                "2024년 3월 2일"
+            ],
+            "answer": {
+                "type" : "search",
+                "success" : false,
+                "originLocationCode" : "HKG",
+                "destinationLocationCode" : "ICN",
+                "departureDate" : "2024-03-02",
+                "adults" : false
+            }
+        },
+        {
+            "chat_history" : [
+                "홍콩에서 출발하는 비행기를 찾아줘",
+                "도착지는 어디인가요?",
+                "인천공항",
+                "출발날짜는 언제인가요?",
+                "2024년 3월 2일",
+                "인원수는 몇명인가요?",
+                "2명"
+            ],
+            "answer": {
+                "type" : "search",
+                "success" : true,
+                "originLocationCode" : "HKG",
+                "destinationLocationCode" : "ICN",
+                "departureDate" : "2024-03-02",
+                "adults" : 2
+            }
+        },
+        {
+            "chat_history" : [
+                "나리타 공항으로 가는 비행기 2인 좌석을 알아봐줘"
+            ],
+            "answer": {
+                "type" : "search",
+                "success" : false,
+                "originLocationCode" : false,
+                "destinationLocationCode" : "NRT",
+                "departureDate" : false,
+                "adults" : 2
+            }
+        },
+        {
+            "chat_history" : [
+                "나리타 공항으로 가는 비행기 2인 좌석을 알아봐줘",
+                "출발지는 어디인가요?",
+                "인천공항"
+            ],
+            "answer": {
+                "type" : "search",
+                "success" : false,
+                "originLocationCode" : "ICN",
+                "destinationLocationCode" : "NRT",
+                "departureDate" : false,
+                "adults" : 2
+            }
+        },
+        {
+            "chat_history" : [
+                "나리타 공항으로 가는 비행기 2인 좌석을 알아봐줘",
+                "출발지는 어디인가요?",
+                "인천공항",
+                "출발날짜는 어디인가요?",
+                "2025년 8월 2일이야"
+            ],
+            "answer": {
+                "type" : "search",
+                "success" : true,
+                "originLocationCode" : "ICN",
+                "destinationLocationCode" : "NRT",
+                "departureDate" : "2025-08-02",
+                "adults" : 2
+            }
+        }
+    ]
+}

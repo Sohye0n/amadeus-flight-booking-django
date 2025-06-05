@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
-
+from datetime import timedelta
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -25,7 +25,7 @@ SECRET_KEY = 'q77h6c^4l2fkcbfwnusbaas#()#mp48hj@_93o#h_+62u%%2t8'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG_VALUE', True)
 HOST_URL = os.environ.get('HOST_URL', 'localhost')
-ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1', HOST_URL]
+ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1', HOST_URL, '54.79.200.131']
 
 # Application definition
 
@@ -146,3 +146,15 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
+SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',  
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=365),  # 액세스 토큰 유효 기간 
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=730),  # 리프레시 토큰 유효 기간 
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+}
+LOGIN_REDIRECT_URL = './users/login'
+
