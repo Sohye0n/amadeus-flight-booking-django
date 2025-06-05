@@ -238,7 +238,29 @@ class FlightCreateOrderView(APIView):
                 full_response=data,
                 create_payload=payload
             )
-            return Response(data, status=201)
+            flight_offer = data['data']['flightOffers'][0]
+            itinerary = flight_offer['itineraries'][0]['segments']
+            first_segment = itinerary[0]
+            last_segment = itinerary[-1]
+
+            simplified_response = {
+                "type": "booking with number",
+                "status": "success",
+                "message": "Flight order successful.",
+                "flightOffers": [
+                    {
+                        "flight_order_id": flight_order_id,
+                        "price": f"{flight_offer['price']['total']} {flight_offer['price']['currency']}",
+                        "departure": first_segment['departure']['iataCode'],
+                        "arrival": last_segment['arrival']['iataCode'],
+                        "departure_time": first_segment['departure']['at'],
+                        "arrival_time": last_segment['arrival']['at'],
+                        "airline": flight_offer['validatingAirlineCodes'][0],
+                        "number_of_stops": len(itinerary) - 1
+                    }
+                ]
+            }
+            return Response(simplified_response, status=201)
         else:
             try:
                 error_detail = response.json()
@@ -344,14 +366,29 @@ class FlightOrderRetrieveView(APIView):
                 flight_order=flight_order,
                 retrieve_response_payload=response_data
             )
-        # Step 3: 정상 데이터 반환 + warning 추가
-        return Response({
-            "type": "list",
+        data = response_data.get("data", {})
+        flight_offer = data['flightOffers'][0]
+        itinerary = flight_offer['itineraries'][0]['segments']
+        first_segment = itinerary[0]
+        last_segment = itinerary[-1]
 
+        order_summary ={
+            "type": "list",
             "status": "success",
             "warnings": warning_messages,
-            "orderData": response_data.get("data", {})
-        }, status=200)
+            "orderData": [{
+                "flight_order_id": unquote(data['id']),
+                "price": f"{flight_offer['price']['total']} {flight_offer['price']['currency']}",
+                "departure": first_segment['departure']['iataCode'],
+                "arrival": last_segment['arrival']['iataCode'],
+                "departure_time": first_segment['departure']['at'],
+                "arrival_time": last_segment['arrival']['at'],
+                "airline": flight_offer['validatingAirlineCodes'][0],
+                "number_of_stops": len(itinerary) - 1
+            }]
+        }
+        # Step 3: 정상 데이터 반환 + warning 추가
+        return Response(order_summary, status=200)
         
 class FlightOrderCancelView(APIView):
     permission_classes = [IsAuthenticated]
