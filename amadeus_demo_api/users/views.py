@@ -57,6 +57,8 @@ class LoginAPI(APIView):
             data = json.loads(request.body)
             username = data.get('username')
             password = data.get('password')
+
+
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
 
@@ -67,7 +69,11 @@ class LoginAPI(APIView):
             refresh = CustomTokenObtainPairSerializer.get_token(user_obj)
             access_token = str(refresh.access_token)
 
-            return JsonResponse({'access': access_token}, status=200)
+            return JsonResponse({
+                
+                'access': access_token,
+                'redirect': '/chat'
+            }, status=200)
         else:
             print("user not match")
             print(username)
@@ -81,7 +87,16 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 # 프론트엔드 (로그인 화면 렌더링)
 class LoginView(View):
     def get(self, request):
-        return render(request, 'users/login.html')
+        requested_url = request.headers.get('X-Requested-URL')
+        print("requested_url", requested_url)
+        return render(request, 'users/login.html', {'current_path': requested_url})
+    
+# 프론트엔드 (로그인 화면 렌더링)
+class MypageView(View):
+    def get(self, request):
+        requested_url = request.headers.get('X-Requested-URL')
+        print("requested_url", requested_url)
+        return render(request, 'users/mypage.html', {'current_path': requested_url})
     
 
 class UserMeView(APIView):#유저 정보보
