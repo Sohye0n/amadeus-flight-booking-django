@@ -16,8 +16,8 @@ services:
     networks:
       - app_network
     environment:
-    - AMADEUS_CLIENT_ID=DhCT3tJ0mO3QHrcGvHeghMm0HxW5RVQI
-    - AMADEUS_CLIENT_SECRET=gmVDGuVJeeIgs4AA
+    - AMADEUS_CLIENT_ID=4eSms4u73rKnOACfdnw1uGBJ8HaGbaU0
+    - AMADEUS_CLIENT_SECRET=7OMNcSyVASq6pWCT
 
   fastapi:
     # FastAPI 서비스 설정
