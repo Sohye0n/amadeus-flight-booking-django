@@ -6,7 +6,7 @@ from typing_extensions import TypedDict
 import json
 
 load_dotenv()
-LLM_NAME = 'gpt-3.5-turbo'
+LLM_NAME = 'gpt-4'
 llm = ChatOpenAI(model_name=LLM_NAME)
 
 class State(TypedDict):
