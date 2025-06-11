@@ -1175,10 +1175,8 @@
 				console.log(data);
 				sessions=data;
 
-				const session_bar_origin = document.querySelector(".gpt_nav_conversation")
-				const session_bar_new = session_bar_origin.cloneNode(true)
-				const session_list = session_bar_origin.parentElement;
-				session_list.forEach(session_element=>{
+				const session_bars = document.querySelectorAll(".gpt_nav_conversation")
+				session_bars.forEach(session_element=>{
 					session_element.classList.remove('selected')
 				})
 
