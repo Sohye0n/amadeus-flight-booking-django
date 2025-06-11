@@ -1006,8 +1006,9 @@
 
 				const latest = document.querySelector(".gpt_nav_conversation")
 				const sessionId_wrapper=document.createElement('div');
-				sessionId_wrapper.classList.add('sessionId');
+				sessionId_wrapper.classList.add('session-Id');
 				sessionId_wrapper.innerText = sessionId;
+				sessionId_wrapper.style.display = 'none'; 
 				latest.classList.add('selected')
 				latest.appendChild(sessionId_wrapper)
 			}
@@ -1161,36 +1162,31 @@
 			})
 			.then(response => response.json())
 			.then(data => {
-				if(data.access){
-					sessions=data;
-				}
-				else{
-					alert("다시 로그인 해주세요")
-					window.location.href="/users/login"
-				}
+				sessions=data
+				
+				sessions.forEach(session => {
+					//텍스트
+					const session_bar_origin = document.querySelector(".gpt_nav_conversation")
+					const session_bar_new = session_bar_origin.cloneNode(true)
+					const session_list = session_bar_origin.parentElement;
+
+					const sessionId_wrapper=document.createElement('div');
+					sessionId_wrapper.classList.add('session-id');
+					sessionId_wrapper.innerText = session.sessionId;
+					sessionId_wrapper.style.display = 'none'; 
+					session_bar_new.appendChild(sessionId_wrapper)
+
+					let innerText = session_bar_new.querySelector('.gpt_nav_conversation-content-text');
+					innerText.innerHTML=session.title;
+					session_bar_new.style.display = "flex";
+					session_list.appendChild(session_bar_new);
+				});
+				console.log('Render chat page');
 			})
 			.catch(error => {
-				alert("서버 오류 발생. 다시 접속해주세요")
+				alert("다시 로그인 해주세요.")
 				window.location.href="/users/login"
 			});
-
-			sessions.forEach(session => {
-				//텍스트
-				const session_bar_origin = document.querySelector(".gpt_nav_conversation")
-				const session_bar_new = session_bar_origin.cloneNode(true)
-				const session_list = session_bar_origin.parentElement;
-
-				const sessionId_wrapper=document.createElement('div');
-				sessionId_wrapper.classList.add('session-id');
-				sessionId_wrapper.innerText = session.sessionId;
-				session_bar_new.appendChild(sessionId_wrapper)
-
-				let innerText = session_bar_new.querySelector('.gpt_nav_conversation-content-text');
-				innerText.innerHTML=session.title;
-				session_bar_new.style.display = "flex";
-				session_list.appendChild(session_bar_new);
-			});
-			console.log('Render chat page');
 		}
 
 	</script>
