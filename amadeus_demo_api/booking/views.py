@@ -11,7 +11,8 @@ import requests
 from .amadeus import AMADEUS_API_BASE_URL
 import urllib.parse
 from urllib.parse import unquote
-
+from chatbot.models import ChatHistory
+from .utils import update_chat_history_answer
 
 class FlightSearchView(APIView):
     permission_classes = [IsAuthenticated]
@@ -35,10 +36,12 @@ class FlightSearchView(APIView):
 
         if search_response.status_code != 200:
             AmadeusService.reset_token()
-            return Response({
+            response_data = {
                 "type": "search",
                 "status": "failed",
-                "message": "ERROR: Flight search response code is not 200,failed."}, status=search_response.status_code)
+                "message": "ERROR: Flight search response code is not 200,failed."}
+            update_chat_history_answer(request, response_data)
+            return Response(response_data, status=search_response.status_code)
 
         search_result = search_response.json()
 
@@ -96,11 +99,14 @@ class FlightSearchView(APIView):
             }
 
         except KeyError:
-            return Response({
+            response_data = {
                 "type": "search",
                 "status": "failed",
-                "message": "ERROR: Search result missing flightOffers."}, status=400)
+                "message": "ERROR: Search result missing flightOffers."}
+            update_chat_history_answer(request, response_data)
+            return Response(response_data, status=400)
 
+        update_chat_history_answer(request, summery_payload)
         #return Response(pricing_payload, status=200)
         return Response(summery_payload, status=200)
     
@@ -120,10 +126,12 @@ class FlightPriceView(APIView):
             return Response(response.json(), status=200)
         else:
             AmadeusService.reset_token()
-            return Response({
+            response_data = {
                 "type": "booking with number",
                 "status": "failed",
-                "message": "ERROR: Flight pricing check failed."}, status=response.status_code)
+                "message": "ERROR: Flight pricing check failed."}
+            update_chat_history_answer(request, response_data)
+            return Response(response_data, status=response.status_code)
 
 
 
@@ -135,28 +143,34 @@ class FlightCreateOrderView(APIView):
 
         flight_offers = request.data.get("flightOffers")
         if not flight_offers:
-            return Response({
+            response_data = {
                 "type": "booking with number",
                 "status": "failed",
-                "message": "ERROR: No flightOffers provided."}, status=400)
+                "message": "ERROR: No flightOffers provided."}
+            update_chat_history_answer(request, response_data)
+            return Response(response_data, status=400)
 
         # Step 1: PassportInfo 가져오기
         passports = PassportInfo.objects.filter(user=request.user)
         if not passports.exists():
-            return Response({
+            response_data = {
                 "type": "booking with number",
                 "status": "failed",
-                "message": "ERROR: No passport information found."}, status=400)
+                "message": "ERROR: No passport information found."}
+            update_chat_history_answer(request, response_data)
+            return Response(response_data, status=400)
 
         # Step 2: travelerPricings에서 필요한 travelerId 목록 추출
         traveler_pricings = flight_offers[0].get("travelerPricings", [])
         traveler_ids = [tp["travelerId"] for tp in traveler_pricings]
 
         if len(traveler_ids) > passports.count():
-            return Response({
+            response_data = {
                 "type": "booking with number",
                 "status": "failed",
-                "message": "ERROR: Not enough passport information for travelers."}, status=400)
+                "message": "ERROR: Not enough passport information for travelers."}
+            update_chat_history_answer(request, response_data)
+            return Response(response_data, status=400)
 
         # Step 3: travelerId 기준으로 travelers 매칭해서 생성
         travelers = []
@@ -260,6 +274,7 @@ class FlightCreateOrderView(APIView):
                     }
                 ]
             }
+            update_chat_history_answer(request, simplified_response)
             return Response(simplified_response, status=201)
         else:
             try:
@@ -272,13 +287,15 @@ class FlightCreateOrderView(APIView):
                     "status_code": response.status_code}
             
             AmadeusService.reset_token()
-            return Response({
+            response_data = {
                 "type": "booking with number",
                 "status": "failed",
                 "message": "ERROR: Flight booking failed.",
                 "detail": error_detail,    #에러 상세 반환
                 "payload": payload         # payload도 같이 반환
-            }, status=401)
+            }
+            update_chat_history_answer(request, response_data)
+            return Response(response_data, status=401)
         
     @staticmethod
     def get_traveler_type(date_of_birth):
@@ -299,10 +316,12 @@ class FlightCreateOrderByIndexView(APIView):
         number = request.data.get("number")  # 챗봇이 보내는 항공편 선택 번호
 
         if not number:
-            return Response({
+            response_data = {
                 "type": "booking with number",
                 "status": "failed",
-                "message": "ERROR: number 필드가 필요합니다."}, status=400)
+                "message": "ERROR: number 필드가 필요합니다."}
+            update_chat_history_answer(request, response_data)
+            return Response(response_data, status=400)
 
         try:
             # 최신 검색 기준으로 최대 5개 중 선택
@@ -313,10 +332,12 @@ class FlightCreateOrderByIndexView(APIView):
             selected_offer = offers[int(number) - 1]
             flight_offer = selected_offer.offer_json
         except (IndexError, ValueError):
-            return Response({
+            response_data = {
                 "type": "booking with number",
                 "status": "failed",
-                "message": f"ERROR: {number}번 항공편을 찾을 수 없습니다."}, status=404)
+                "message": f"ERROR: {number}번 항공편을 찾을 수 없습니다."}
+            update_chat_history_answer(request, response_data)
+            return Response(response_data, status=404)
 
         # 기존 예약 로직 재활용
         request.data["flightOffers"] = [flight_offer]
@@ -338,18 +359,22 @@ class FlightOrderRetrieveView(APIView):
         print("All stored IDs:", list(FlightOrder.objects.values_list("flight_order_id", flat=True)))
         if response.status_code != 200:
             AmadeusService.reset_token()
-            return Response({
+            response_data = {
                 "type": "list",
                 "status": "failed",
-                "message": "ERROR: Flight order list is not 200, failed."}, status=response.status_code)
+                "message": "ERROR: Flight order list is not 200, failed."}
+            update_chat_history_answer(request, response_data)
+            return Response(response_data, status=response.status_code)
 
         # Step 1: errors 필드 체크
         if "errors" in response_data:
-            return Response({
+            response_data = {
                 "type": "list",
                 "status": "failed",
                 "message": response_data["errors"]
-            }, status=401)
+            }
+            update_chat_history_answer(request, response_data)
+            return Response(response_data, status=401)
 
         # Step 2: warnings 필드 체크
         warning_messages = []
@@ -388,6 +413,7 @@ class FlightOrderRetrieveView(APIView):
             }]
         }
         # Step 3: 정상 데이터 반환 + warning 추가
+        update_chat_history_answer(request, order_summary)
         return Response(order_summary, status=200)
         
 class FlightOrderCancelView(APIView):
@@ -411,13 +437,17 @@ class FlightOrderCancelView(APIView):
                 cancel_request_payload={"method": "DELETE", "url": url},
                 cancel_response_payload={"status_code": 204, "message": "Cancelled"}
             )
-            return Response({
+            response_data = {
                 "type": "cancel",
                 "status": "success",
-                "message": "Flight order cancelled successfully."}, status=204)
+                "message": "Flight order cancelled successfully."}
+            update_chat_history_answer(request, response_data)
+            return Response(response_data, status=204)
         else:
             AmadeusService.reset_token()
-            return Response({
+            response_data = {
                 "type": "cancel",
                 "status": "failed",
-                "message": "ERROR: Flight order cancellation failed."}, status=401)
+                "message": "ERROR: Flight order cancellation failed."}
+            update_chat_history_answer(request, response_data)
+            return Response(response_data, status=401)
