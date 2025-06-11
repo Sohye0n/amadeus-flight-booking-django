@@ -888,8 +888,8 @@
 
 			// 리다이렉트
 			history.pushState(null, '', `/chat/${sessionId}`);
-			document.querySelector(".gpt_content-top").style.display = "flex";
-			document.querySelector(".gpt_content-answer").style.display = "none";
+			document.querySelector(".gpt_content-top").style.display = "none";
+			document.querySelector(".gpt_content-answer").style.display = "flex";
 
 			// 채팅 히스토리 렌더링
 			histories = await getChatHistory(sessionId)
