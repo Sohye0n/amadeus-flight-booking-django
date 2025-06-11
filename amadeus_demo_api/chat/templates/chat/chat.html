@@ -1014,7 +1014,7 @@
 				let innerText = latest.querySelector('.gpt_nav_conversation-content-text');
 				sessionId_wrapper.style.display = 'none'; 
 				latest.classList.add('selected')
-				latest.appendChild(sessionId_wrapper)
+				latest.parentElement.appendChild(sessionId_wrapper)
 			}
 
 			let matchingAnswer;
@@ -1169,23 +1169,23 @@
 				console.log(data);
 				sessions=data;
 
-				//텍스트
-				const session_bar_origin = document.querySelector(".gpt_nav_conversation")
-				const session_bar_new = session_bar_origin.cloneNode(true)
-				const session_list = session_bar_origin.parentElement;
+				// //텍스트
+				// const session_bar_origin = document.querySelector(".gpt_nav_conversation")
+				// const session_bar_new = session_bar_origin.cloneNode(true)
+				// const session_list = session_bar_origin.parentElement;
 
-				const sessionId_wrapper=document.createElement('div');
-				sessionId_wrapper.classList.add('session-Id');
-				sessionId_wrapper.innerText = sessions[sessions.length-1].sessionId;
-				sessionId_wrapper.style.display = 'none'; 
-				session_bar_new.appendChild(sessionId_wrapper)
+				// const sessionId_wrapper=document.createElement('div');
+				// sessionId_wrapper.classList.add('session-Id');
+				// sessionId_wrapper.innerText = sessions[sessions.length-1].sessionId;
+				// sessionId_wrapper.style.display = 'none'; 
+				// session_bar_new.appendChild(sessionId_wrapper)
 
-				let innerText = session_bar_new.querySelector('.gpt_nav_conversation-content-text');
-				innerText.innerHTML=sessions[sessions.length-1].title;
-				session_bar_new.style.display = "flex";
-				session_list.appendChild(session_bar_new);
+				// let innerText = session_bar_new.querySelector('.gpt_nav_conversation-content-text');
+				// innerText.innerHTML=sessions[sessions.length-1].title;
+				// session_bar_new.style.display = "flex";
+				// session_list.appendChild(session_bar_new);
 
-				console.log('Render chat page');
+				// console.log('Render chat page');
 			})
 			.catch(error => {
 				alert("다시 로그인 해주세요.")
