@@ -847,7 +847,7 @@
 
 		async function getChatHistory(sessionId){
 			try{
-				const response = await apiClient.get('chat/history/');
+				const response = await apiClient.get('chat/history');
 				const histories = response.data.chat_history;
 				console.log(histories)
 				return histories
@@ -880,7 +880,7 @@
 			event.currentTarget.classList.add('selected');
 
 			// 세션 id 가져오기
-			let sessionId = event.currentTarget.querySelector(".session-id").innerText
+			let sessionId = event.currentTarget.querySelector(".session-Id").innerText
 			localStorage.removeItem("sessionId");
 			localStorage.setItem("sessionId", sessionId);
 
