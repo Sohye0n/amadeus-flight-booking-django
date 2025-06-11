@@ -15,6 +15,7 @@ class ChatHistory(models.Model):
     session_id = models.CharField(max_length=255,default = "1")
     question = models.TextField()
     answer = models.TextField()
+    ai_answer = models.TextField(null=True, blank=True,default="")  # 챗봇이 준 답변
     timestamp = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
