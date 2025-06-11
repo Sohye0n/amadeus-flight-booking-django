@@ -969,9 +969,10 @@
 				const questionType = response.data.type;
 
 				const handlers = {
-					search: handleSearch,
-					'flight-order': handleFlightOrder,
-					list: handleList
+					"search": handleSearch,
+					"booking with number": handleBooking,
+					"list": handleList,
+					"cancel": handleCancel
 				};
 
 				if (questionType) {
