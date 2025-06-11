@@ -847,7 +847,9 @@
 
 		async function getChatHistory(sessionId){
 			try{
-				const response = await apiClient.get('chat/history');
+				const response = await apiClient.post('chat/history',{
+					"sessionId":sessionId
+				});
 				const histories = response.data.chat_history;
 				console.log(histories)
 				return histories
