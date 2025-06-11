@@ -258,15 +258,15 @@
 										<h2>Examples</h2>
 									</div><a id="w-node-f2eeda60-8d2d-df4a-a4e6-9deb17ff7cb4-a42f563e" href="#"
 										class="gpt_home-content_table-content is-link is-dark w-inline-block">
-										<div>&quot;<span class="gpt_example-text"> 다음주 월요일부터 2박 3일로 숙박 가능한 부산 호텔을 찾아줘
+										<div>&quot;<span class="gpt_example-text"> 2025년 6월 20일 인천에서 런던으로 가는 1인 항공권 검색해줘
 												</span>&quot; →</div>
 									</a><a id="w-node-f2eeda60-8d2d-df4a-a4e6-9deb17ff7cba-a42f563e" href="#"
 										class="gpt_home-content_table-content is-link is-dark w-inline-block">
-										<div>&quot;<span class="gpt_example-text"> 호텔 예약 내역을 확인하고 싶어
+										<div>&quot;<span class="gpt_example-text"> 항공권 예약 내역을 확인하고 싶어
 												</span>&quot; →</div>
 									</a><a id="w-node-f2eeda60-8d2d-df4a-a4e6-9deb17ff7cc0-a42f563e" href="#"
 										class="gpt_home-content_table-content is-link is-dark w-inline-block">
-										<div>&quot;<span class="gpt_example-text"> 호텍 예약 일정을 변경하고 싶어 
+										<div>&quot;<span class="gpt_example-text"> 항공권 예약 일정을 변경하고 싶어 
 												</span>&quot; →</div>
 									</a>
 								</div>
@@ -922,6 +922,7 @@
 				const sessionId_wrapper=document.createElement('div');
 				sessionId_wrapper.classList.add('session-id');
 				sessionId_wrapper.innerText = session.sessionId;
+				sessionId_wrapper.style.display = 'none'; 
 				session_bar_new.appendChild(sessionId_wrapper)
 
 				let innerText = session_bar_new.querySelector('.gpt_nav_conversation-content-text');
@@ -1160,13 +1161,17 @@
 			})
 			.then(response => response.json())
 			.then(data => {
-				console.log('응답:', data);
-				sessions=resonse.data;
+				if(data.access){
+					sessions=data;
+				}
+				else{
+					alert("다시 로그인 해주세요")
+					window.location.href="/users/login"
+				}
 			})
 			.catch(error => {
-				console.log(data);
-				console.log(error);
-				//window.location.href="/users/login"
+				alert("서버 오류 발생. 다시 접속해주세요")
+				window.location.href="/users/login"
 			});
 
 			sessions.forEach(session => {
