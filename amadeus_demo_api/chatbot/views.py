@@ -102,9 +102,9 @@ class AskChatbotView(APIView):
 
         # 질문 기록 먼저 저장
         chat_record = ChatHistory.objects.create(user=user, question=question, session_id=session_id,answer=str(ai_data))
-        ai_data["sessionId"] = session_id
-        ai_data["user"] = user
-        ai_data["question"] = question
+        # ai_data["sessionId"] = session_id
+        # ai_data["user"] = user
+        # ai_data["question"] = question
         ai_data["chatHistory_id"] = chat_record.id
         # dispatcher로 넘기기
         # request.data를 ai_data로 덮기 위해 새 요청 생성
