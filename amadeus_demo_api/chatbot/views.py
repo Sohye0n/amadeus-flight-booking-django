@@ -41,7 +41,9 @@ class ChatHistoryView(APIView):
         ).order_by('timestamp')
 
         chat_history_list = []
-        chat_history_list = [item for r in chat_records for item in (r.question, r.answer)]
+        for r in chat_records:
+            chat_history_list.append(r.question)
+            chat_history_list.append(r.ai_answer if r.ai_answer else r.answer)
 
         #serializer = ChatHistorySerializer(chat_records, many=True)
         return Response({"chat_history": chat_history_list}, status=status.HTTP_200_OK)
@@ -76,8 +78,14 @@ class AskChatbotView(APIView):
         
         chat_records = ChatHistory.objects.filter(user=user).order_by('timestamp')
         chat_records = ChatHistory.objects.filter(user=user, session_id=session_id).order_by('timestamp')
-        chat_history_list = [q for record in chat_records for q in (record.question, record.answer)]
+        #chat_history_list = [q for record in chat_records for q in (record.question, record.answer)]
+        #chat_history_list.append(question)
+        chat_history_list = []
+        for record in chat_records:
+            chat_history_list.append(record.question)
+            chat_history_list.append(record.ai_answer if record.ai_answer else record.answer)
         chat_history_list.append(question)
+
 
         payload = {
             "chat_history": chat_history_list
