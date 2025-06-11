@@ -32,7 +32,7 @@ function handleSearch(data) {
             출발 시간은 ${formatDateTime(departure_time)}, 도착 시간은 ${formatDateTime(arrival_time)}로
             총 ${durationHours}시간 ${durationMinutes}분이 소요됩니다.\n가격은 ${price}입니다. 경유 ${number_of_stops}회.`);
     })
-    return matchingAnwers.join("--------------");
+    return matchingAnwers.join("\n\n");
 }
 
 // "booking with number" 타입 질문에 대한 답변 가공
@@ -50,7 +50,8 @@ function handleBooking(data) {
   
     console.log("Booking handler:", data);
     console.log(data.status)
-    if(data.status==="failed") return(data.message);let matchingAnwers=[]
+    if(data.status==="failed") return(data.message);
+    let matchingAnwers;
     
     data.flightOffers.map((offer, index) => {
         const {
@@ -70,14 +71,10 @@ function handleBooking(data) {
         const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
         const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
     
-        matchingAnwers.push(`
-          예약이 완료되었습니다.
-          예약 코드는 ${flight_order_id} 입니다.
-          예약하신 항공권 정보를 다시 알려드려요.
-          ${airline} 항공.\n${departure}에서 출발하여 ${arrival}에 도착합니다.\n
-            출발 시간은 ${formatDateTime(departure_time_)}, 도착 시간은 ${formatDateTime(arrival_time_)}로
-            총 ${durationHours}시간 ${durationMinutes}분이 소요됩니다.\n가격은 ${price}입니다. 경유 ${number_of_stops}회.
-          `);
+        matchingAnwers=`예약이 완료되었습니다.\n 예약 코드는 ${flight_order_id} 입니다.\n
+          예약하신 항공권 정보를 다시 알려드려요.\n ${airline} 항공.\n${departure}에서 출발하여 ${arrival}에 도착합니다.\n
+          출발 시간은 ${formatDateTime(departure_time_)}, 도착 시간은 ${formatDateTime(arrival_time_)}로
+          총 ${durationHours}시간 ${durationMinutes}분이 소요됩니다.\n가격은 ${price}입니다. 경유 ${number_of_stops}회.`;
     })
     return matchingAnwers;
 }
@@ -97,7 +94,8 @@ function handleList(data) {
   
     console.log("list handler:", data);
     console.log(data.status)
-    if(data.status==="failed") return(data.message);let matchingAnwers=[]
+    if(data.status==="failed") return(data.message);
+    let matchingAnwers;
     
     data.flightOffers.map((offer, index) => {
         const {
@@ -117,14 +115,13 @@ function handleList(data) {
         const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
         const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
     
-        matchingAnwers.push(`
-          요청하신 예약 내역에 대한 정보를 알려드려요.
-          예약 코드는 ${flight_order_id} 입니다.
-          예약하신 항공권 정보를 다시 알려드려요.
+        matchingAnwers=`
+          요청하신 예약 내역에 대한 정보를 알려드려요.\n
+          예약 코드는 ${flight_order_id} 입니다.\n
+          예약하신 항공권 정보를 다시 알려드려요.\n
           ${airline} 항공.\n${departure}에서 출발하여 ${arrival}에 도착합니다.\n
             출발 시간은 ${formatDateTime(departure_time_)}, 도착 시간은 ${formatDateTime(arrival_time_)}로
-            총 ${durationHours}시간 ${durationMinutes}분이 소요됩니다.\n가격은 ${price}입니다. 경유 ${number_of_stops}회.
-          `);
+            총 ${durationHours}시간 ${durationMinutes}분이 소요됩니다.\n가격은 ${price}입니다. 경유 ${number_of_stops}회.`;
     })
     return matchingAnwers;
 }
