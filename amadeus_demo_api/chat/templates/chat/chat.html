@@ -1176,12 +1176,12 @@
 
 				const sessionId_wrapper=document.createElement('div');
 				sessionId_wrapper.classList.add('session-Id');
-				sessionId_wrapper.innerText = session[session.length-1].sessionId;
+				sessionId_wrapper.innerText = sessions[sessions.length-1].sessionId;
 				sessionId_wrapper.style.display = 'none'; 
 				session_bar_new.appendChild(sessionId_wrapper)
 
 				let innerText = session_bar_new.querySelector('.gpt_nav_conversation-content-text');
-				innerText.innerHTML=session[session.length-1].title;
+				innerText.innerHTML=sessions[sessions.length-1].title;
 				session_bar_new.style.display = "flex";
 				session_list.appendChild(session_bar_new);
 
