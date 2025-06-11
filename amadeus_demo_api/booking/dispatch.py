@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from .views import FlightSearchView, FlightPriceView, FlightCreateOrderView, FlightOrderRetrieveView, FlightOrderCancelView,FlightCreateOrderByIndexView
 from django.test.client import RequestFactory
 from .models import FlightOrder
+from chatbot.models import ChatHistory
 class AmadeusIntentDispatcherView(APIView):
     permission_classes = [IsAuthenticated]
 

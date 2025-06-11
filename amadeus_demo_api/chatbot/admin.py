@@ -1,6 +1,15 @@
 from django.contrib import admin
+from .models import ChatHistory, ChatbotFlightActionLog, ChatSession
 
-from .models import ChatHistory,ChatbotFlightActionLog
+@admin.register(ChatHistory)
+class ChatHistoryAdmin(admin.ModelAdmin):
+    # 모든 필드를 기본 순서대로 보여줌
+    pass
 
-admin.site.register(ChatHistory)
-admin.site.register(ChatbotFlightActionLog)
+@admin.register(ChatbotFlightActionLog)
+class ChatbotFlightActionLogAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(ChatSession)
+class ChatSessionAdmin(admin.ModelAdmin):
+    pass
