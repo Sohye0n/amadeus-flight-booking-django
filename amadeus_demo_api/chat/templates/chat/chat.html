@@ -1160,16 +1160,11 @@
 					'X-CSRFToken': csrftoken,
 				},
 			})
-			.then(response => {
-				if(!response.ok){
-					throw new Error(`HTTP error! status: ${response.status}`);
-				}
-				console.log(response)
-				return response.data;
-			})
+			.then(response =>response.json())
 			.then(data => {
-				console.log(data)
-				sessions=data;
+				console.log(data);
+				console.log(data.data);
+				sessions=data.data;
 				sessions.forEach(session => {
 					//텍스트
 					const session_bar_origin = document.querySelector(".gpt_nav_conversation")
