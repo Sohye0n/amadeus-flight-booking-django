@@ -2,6 +2,7 @@ import json
 from chatbot.models import ChatHistory  # 정확한 위치로 수정 필요
 
 def update_chat_history_answer(request, response_data):
+    print("response_data:\n",response_data)
     chat_history_id = request.data.get("chatHistory_id")
     if chat_history_id:
         try:
