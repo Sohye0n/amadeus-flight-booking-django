@@ -1163,8 +1163,7 @@
 			.then(response =>response.json())
 			.then(data => {
 				console.log(data);
-				console.log(data.data);
-				sessions=data.data;
+				sessions=data;
 				sessions.forEach(session => {
 					//텍스트
 					const session_bar_origin = document.querySelector(".gpt_nav_conversation")
