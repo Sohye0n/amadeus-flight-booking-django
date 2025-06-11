@@ -933,12 +933,15 @@
 		});
 
 		function generateUUID() {
-			// RFC4122 버전 4 UUID 생성기
-			return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-			const r = Math.random() * 16 | 0;
-			const v = c === 'x' ? r : (r & 0x3 | 0x8);
-			return v.toString(16);
-			})
+			const timestamp = Date.now().toString(16); // 현재 시간 (밀리초)를 16진수로 변환
+			const randomPart = 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+				const r = Math.random() * 16 | 0;
+				const v = c === 'x' ? r : (r & 0x3 | 0x8);
+				return v.toString(16);
+			});
+
+			// 앞에 타임스탬프 붙여서 고유성 높임
+			return `${timestamp}-${randomPart.substring(0, 12)}-${randomPart.substring(12, 16)}-${randomPart.substring(16, 20)}-${randomPart.substring(20, 32)}`;
 		}
 
 		async function sendMessage(sessionId,inputValue){
@@ -1164,23 +1167,23 @@
 			.then(data => {
 				console.log(data);
 				sessions=data;
-				sessions.forEach(session => {
-					//텍스트
-					const session_bar_origin = document.querySelector(".gpt_nav_conversation")
-					const session_bar_new = session_bar_origin.cloneNode(true)
-					const session_list = session_bar_origin.parentElement;
+				// sessions.forEach(session => {
+				// 	//텍스트
+				// 	const session_bar_origin = document.querySelector(".gpt_nav_conversation")
+				// 	const session_bar_new = session_bar_origin.cloneNode(true)
+				// 	const session_list = session_bar_origin.parentElement;
 
-					const sessionId_wrapper=document.createElement('div');
-					sessionId_wrapper.classList.add('session-Id');
-					sessionId_wrapper.innerText = session.sessionId;
-					sessionId_wrapper.style.display = 'none'; 
-					session_bar_new.appendChild(sessionId_wrapper)
+				// 	const sessionId_wrapper=document.createElement('div');
+				// 	sessionId_wrapper.classList.add('session-Id');
+				// 	sessionId_wrapper.innerText = session.sessionId;
+				// 	sessionId_wrapper.style.display = 'none'; 
+				// 	session_bar_new.appendChild(sessionId_wrapper)
 
-					let innerText = session_bar_new.querySelector('.gpt_nav_conversation-content-text');
-					innerText.innerHTML=session.title;
-					session_bar_new.style.display = "flex";
-					session_list.appendChild(session_bar_new);
-				});
+				// 	let innerText = session_bar_new.querySelector('.gpt_nav_conversation-content-text');
+				// 	innerText.innerHTML=session.title;
+				// 	session_bar_new.style.display = "flex";
+				// 	session_list.appendChild(session_bar_new);
+				// });
 				console.log('Render chat page');
 			})
 			.catch(error => {
