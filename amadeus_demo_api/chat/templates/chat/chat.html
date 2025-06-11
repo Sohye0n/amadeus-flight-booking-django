@@ -922,6 +922,7 @@
 				const sessionId_wrapper=document.createElement('div');
 				sessionId_wrapper.classList.add('session-id');
 				sessionId_wrapper.innerText = session.sessionId;
+				sessionId_wrapper.style.display = 'none'; 
 				session_bar_new.appendChild(sessionId_wrapper)
 
 				let innerText = session_bar_new.querySelector('.gpt_nav_conversation-content-text');
