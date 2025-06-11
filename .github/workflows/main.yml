@@ -1,4 +1,4 @@
-name: Build and deploy container app to EC2 - flight-booking-engine
+name: Build and deploy container app to EC2 - flignt-booking-engineMore actions
 
 on:
   push:
@@ -7,34 +7,33 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  # build:
+  #   runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+  #   steps:
+  #   - uses: actions/checkout@v2
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+  #   - name: Set up Docker Buildx
+  #     uses: docker/setup-buildx-action@v2
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+  #   - name: Log in to Docker Hub
+  #     uses: docker/login-action@v2
+  #     with:
+  #       username: ${{ secrets.DOCKER_USERNAME }}
+  #       password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v3
-      with:
-        context: .
-        push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/amadeusflightbookingdjango:latest
+  #   - name: Build and push container image to Docker Hub
+  #     uses: docker/build-push-action@v3
+  #     with:
+  #       push: true
+  #       tags: ${{ secrets.DOCKER_USERNAME }}/amadeusflightbookingdjango:${{ github.sha }}
+  #       file: ./Dockerfile
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build
+    # needs: build
 
-    steps:
+    steps:      
     - name: Deploy to EC2 via SSH
       uses: appleboy/ssh-action@v1.0.0
       with:
@@ -46,8 +45,8 @@ jobs:
           echo "AMADEUS_CLIENT_ID=${{secrets.AMADEUS_CLIENT_ID}}" > ~/flight-booking.env
           echo "AMADEUS_CLIENT_SECRET=${{secrets.AMADEUS_CLIENT_SECRET}}" >> ~/flight-booking.env
           echo "HOST_URL=${{secrets.HOST_URL}}" >> ~/flight-booking.env
-
+          
           cd ./amadeus-flight-booking-django
+          docker-compose down
           git pull
-          docker-compose pull
-          docker-compose up -d
+          docker-compose up --build &
