@@ -1164,11 +1164,12 @@
 				if(!response.ok){
 					throw new Error(`HTTP error! status: ${response.status}`);
 				}
-				return response.json();
+				console.log(response)
+				return response.data;
 			})
-			.then(json => {
-				console.log(json)
-				sessions=json.data
+			.then(data => {
+				console.log(data)
+				sessions=data;
 				sessions.forEach(session => {
 					//텍스트
 					const session_bar_origin = document.querySelector(".gpt_nav_conversation")
