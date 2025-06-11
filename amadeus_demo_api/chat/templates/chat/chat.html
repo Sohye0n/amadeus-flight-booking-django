@@ -996,17 +996,11 @@
 
 				document.querySelector(".gpt_content-top").style.display = "none";
 				document.querySelector(".gpt_content-answer").style.display = "flex";
-				document.querySelector(".gpt_nav_conversation").style.display = "flex";
+				//document.querySelector(".gpt_nav_conversation").style.display = "flex";
 				isFirstSubmit = false;
-
-				// 모든 채팅 세션방에 대해 eventListner 부착
-				const sessions = document.querySelectorAll(".gpt_nav_conversation")
-				console.log(sessions)
-				sessions.forEach(session=>{
-					console.log(session);
-					session.addEventListener('click', sessionClickListener);
-				})
-
+			
+				const session_bar_origin = document.querySelector(".gpt_nav_conversation")
+				const session_bar_new = session_bar_origin.cloneNode(true)
 				session_bar_new.classList.add('selected')
 				const session_list = session_bar_origin.parentElement;
 				const sessionId_wrapper=document.createElement('div');
@@ -1019,6 +1013,14 @@
 				innerText.innerHTML=session.title;
 				session_bar_new.style.display = "flex";
 				session_list.appendChild(session_bar_new);
+
+				// 모든 채팅 세션방에 대해 eventListner 부착
+				const sessions = document.querySelectorAll(".gpt_nav_conversation")
+				console.log(sessions)
+				sessions.forEach(session=>{
+					console.log(session);
+					session.addEventListener('click', sessionClickListener);
+				})
 			}
 
 			let matchingAnswer;
