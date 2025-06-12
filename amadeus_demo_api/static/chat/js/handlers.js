@@ -97,7 +97,7 @@ function handleList(data) {
     if(data.status==="failed") return(data.message);
     let matchingAnwers;
     
-    data.flightOffers.map((offer, index) => {
+    data.orderData.map((offer, index) => {
         const {
             flight_order_id,
             price,
