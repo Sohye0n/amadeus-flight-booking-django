@@ -1,4 +1,4 @@
-import requests
+import requests,json
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -105,11 +105,11 @@ class AskChatbotView(APIView):
                 "message": "ERROR: AI 서버 연결 실패", 
                 "detail": str(e)
             }
-            ChatHistory.objects.create(user=user, question=question, session_id=session_id,answer=str(response_data),ai_answer="")
+            ChatHistory.objects.create(user=user, question=question, session_id=session_id,answer=json.dumps(response_data, ensure_ascii=False),ai_answer="")
             return Response(response_data, status=500)
 
         # 질문 기록 먼저 저장
-        chat_record = ChatHistory.objects.create(user=user, question=question, session_id=session_id,answer=str(ai_data))
+        chat_record = ChatHistory.objects.create(user=user, question=question, session_id=session_id,answer=json.dumps(ai_data, ensure_ascii=False))
         # ai_data["sessionId"] = session_id
         # ai_data["user"] = user
         # ai_data["question"] = question
