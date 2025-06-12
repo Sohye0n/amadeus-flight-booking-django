@@ -897,6 +897,7 @@
 				if(index % 2 == 0){
 					addUserChatLine(item)
 				}else{
+					item=JSON.parse(item);
 					if (lightMode1.style.display === "none") addBotChatLine("is-light", item);
 					else addBotChatLine("is-dark", item);
 				}
