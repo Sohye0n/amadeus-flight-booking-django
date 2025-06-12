@@ -898,6 +898,22 @@
 					addUserChatLine(item)
 				}else{
 					item=JSON.parse(item);
+					const questionType = item.type;
+					const handlers = {
+						"search": handleSearch,
+						"booking with number": handleBooking,
+						"list": handleList,
+						"cancel": handleCancel
+					};
+
+					if (questionType) {
+						const handler = handlers[questionType];
+						item = handler(item);
+					} else {
+						console.log(`request failure`);
+						item = defaultHandler(item);
+					}
+
 					if (lightMode1.style.display === "none") addBotChatLine("is-light", item);
 					else addBotChatLine("is-dark", item);
 				}
