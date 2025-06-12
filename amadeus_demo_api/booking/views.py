@@ -435,14 +435,14 @@ class FlightOrderCancelView(APIView):
                 user=request.user,
                 flight_order=order,
                 cancel_request_payload={"method": "DELETE", "url": url},
-                cancel_response_payload={"status_code": 204, "message": "Cancelled"}
+                cancel_response_payload={"status_code": 200, "message": "Cancelled"}
             )
             response_data = {
                 "type": "cancel",
                 "status": "success",
                 "message": "Flight order cancelled successfully."}
             update_chat_history_answer(request, response_data)
-            return Response(response_data, status=204)
+            return Response(response_data, status=200)
         else:
             AmadeusService.reset_token()
             response_data = {
